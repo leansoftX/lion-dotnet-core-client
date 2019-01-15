@@ -1,0 +1,7 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/LeansoftX.Lion.Client/bin/Debug/netcoreapp2.0
+/LeansoftX.Lion.Client/obj
+/.vs/LeansoftX.Lion.Client/v15
