@@ -1,5 +1,7 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace Lion.Client.SDK
 {
@@ -24,5 +26,24 @@ namespace Lion.Client.SDK
             var result = _httpClient.GetStringAsync(flagStatusAPI).Result;
             return bool.Parse(result);
         }
+
+        public bool BoolVariation(string key, LionUser user)
+        {
+            sendFlagRequestEvent(key, user);
+            var flagStatusAPI = string.Format("{0}/FlagStatuses/{1}", DefaultAPIUri, key);
+            var result = _httpClient.GetStringAsync(flagStatusAPI).Result;
+            return bool.Parse(result);
+
+        }
+
+
+        private void sendFlagRequestEvent(string key, LionUser user)
+        {
+            var userAPI = string.Format("{0}/User", DefaultAPIUri);
+            var httpContent=new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+            var result = _httpClient.PostAsync(userAPI, httpContent);
+        }
+
+
     }
 }
