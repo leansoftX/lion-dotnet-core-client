@@ -16,7 +16,7 @@ Lion Client SDK for .NET
 
 3. 在项目中创建LionClient对象
 
-         LionClient lionClient = new LionClient("环境SDK");
+         LionClient lionClient = new LionClient("environment-sdk");
 
 创建你的第一个功能开关
 -----------------------
@@ -25,12 +25,13 @@ Lion Client SDK for .NET
 5. 在你的业务系统里，通过创建好的 ”功能标记“ 唯一标示，来验证功能是否开启
 
         
-        bool showFeature = lionClient.BoolVariation("your.feature.key");
+		var user = new LionUser("user-unique-key");
+        bool showFeature = lionClient.BoolVariation("feature-key",user,false);
+		
         if (showFeature) {
           // 显示功能的业务逻辑代码
         }
         else {
           // 关闭功能的业务逻辑代码
         }
-
 
