@@ -6,7 +6,11 @@
     <Product>ProjectLion</Product>
     <Authors>LeansoftX</Authors>
     <Copyright>LeansoftX</Copyright>
-    <Version>1.0.4</Version>
+    <Version>1.0.7</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
 
 </Project>
