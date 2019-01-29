@@ -29,13 +29,13 @@ namespace Lion.Client.SDK
             return bool.Parse(result);
         }
 
-        public async Task<bool> BoolVariation(string key, LionUser user, bool defaultValue = false)
+        public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
             
             var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
-            var response = await _httpClient.GetAsync(requestUrl);
+            var response =  _httpClient.GetAsync(requestUrl);
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (response.Result.StatusCode != HttpStatusCode.OK)
             {
                 //send user request event and save user
                 sendFlagRequestEvent(key, user);
@@ -43,8 +43,8 @@ namespace Lion.Client.SDK
 
             }
 
-            var content = response.Content.ReadAsStringAsync().Result;
-            var flag= JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(content);
+            var result = response.Result.Content.ReadAsStringAsync().Result;
+            var flag= JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
 
             var feature = new Feature(flag);
             return feature.Evaluate(user);
