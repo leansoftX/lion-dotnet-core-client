@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lion.Client.SDK
 {
@@ -27,12 +29,25 @@ namespace Lion.Client.SDK
             return bool.Parse(result);
         }
 
-        public bool BoolVariation(string key, LionUser user)
+        public async Task<bool> BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
-            sendFlagRequestEvent(key, user);
-            var flagStatusAPI = string.Format("{0}/FlagStatuses/{1}", DefaultAPIUri, key);
-            var result = _httpClient.GetStringAsync(flagStatusAPI).Result;
-            return bool.Parse(result);
+            
+            var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
+            var response = await _httpClient.GetAsync(requestUrl);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                //send user request event and save user
+                sendFlagRequestEvent(key, user);
+                return defaultValue;
+
+            }
+
+            var content = response.Content.ReadAsStringAsync().Result;
+            var flag= JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(content);
+
+            var feature = new Feature(flag);
+            return feature.Evaluate(user);
 
         }
 
