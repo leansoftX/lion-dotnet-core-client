@@ -32,7 +32,10 @@ namespace Lion.Client.SDK
         public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
             //send user request event and save user
-            sendFlagRequestEvent(key, user);
+            if (!string.IsNullOrEmpty(user.Key))
+            {
+                sendFlagRequestEvent(key, user);
+            }
 
             var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
             var response =  _httpClient.GetAsync(requestUrl);
