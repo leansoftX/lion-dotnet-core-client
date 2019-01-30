@@ -8,6 +8,8 @@ namespace Lion.Client.SDK
 {
     public class LionUser
     {
+
+
         [JsonProperty(PropertyName = "key", NullValueHandling = NullValueHandling.Ignore)]
         public string Key { get; set; }
 
@@ -23,6 +25,8 @@ namespace Lion.Client.SDK
         public LionUser(string key)
         {
             Key = key;
+            Custom = new Dictionary<string, JToken>();
+
         }
 
         public static LionUser WithKey(string key)
