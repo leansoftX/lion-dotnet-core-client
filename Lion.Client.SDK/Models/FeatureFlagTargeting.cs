@@ -24,10 +24,17 @@ namespace Lion.Client.SDK.Models
 
         public bool IsTargeting { get; set; }
 
+        public Guid DefaultVariation { get; set; }
+
+        public Guid TargetingOffVariation { get; set; }
+
         public IList<User> FeatureOnTargetingUsers { get; set; }
 
         public IList<User> FeatureOffTargetingUsers { get; set; }
 
+        public IList<RuleObj> Rules { get; set; }
+
+        public IList<FeatureFlagVariationObj> FeatureFlagVariations { get; set; }
 
         #endregion
     }

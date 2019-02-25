@@ -31,14 +31,15 @@ namespace Lion.Client.SDK
 
         public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
+            var feedbackUser = new LionUser(user.Key);
             //send user request event and save user
             if (!string.IsNullOrEmpty(user.Key))
             {
-                sendFlagRequestEvent(key, user);
+                feedbackUser = SendFlagRequestEvent(key, user);
             }
 
             var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
-            var response =  _httpClient.GetAsync(requestUrl);
+            var response = _httpClient.GetAsync(requestUrl);
 
             if (response.Result.StatusCode != HttpStatusCode.OK)
             {
@@ -46,21 +47,28 @@ namespace Lion.Client.SDK
             }
 
             var result = response.Result.Content.ReadAsStringAsync().Result;
-            var flag= JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
+            var flag = JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
 
             var feature = new Feature(flag);
-            return feature.Evaluate(user);
-
+            return feature.Evaluate(feedbackUser, defaultValue);
         }
 
-
-        private void sendFlagRequestEvent(string key, LionUser user)
+        private LionUser SendFlagRequestEvent(string key, LionUser user)
         {
             var userAPI = string.Format("{0}/User", DefaultAPIUri);
-            var httpContent=new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
-            var result = _httpClient.PostAsync(userAPI, httpContent);
+            var httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+            var response = _httpClient.PostAsync(userAPI, httpContent);
+            if (response.Result.StatusCode != HttpStatusCode.OK)
+            {
+                return new LionUser(user.Key)
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Custom = user.Custom,
+                };
+            }
+            var result = response.Result.Content.ReadAsStringAsync().Result;
+            return JsonConvert.DeserializeObject<LionUser>(result);
         }
-
-
     }
 }
