@@ -79,66 +79,7 @@ namespace Lion.Client.SDK
                     {
                         #region Get User Attibute Value
                         var attributeValue = user.Custom[attributeName].ToString();
-                        switch (condition.Operation)
-                        {
-                            case "greater_than":
-                                try
-                                {
-                                    var convertedUserValue = double.Parse(attributeValue);
-                                    var convertedConditionValue = double.Parse(condition.ExpectValue);
-                                    if (convertedUserValue <= convertedConditionValue)
-                                    {
-                                        isMatchRule = false;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    isMatchRule = false;
-                                }
-                                break;
-                            case "less_than":
-                                try
-                                {
-                                    var convertedUserValue = double.Parse(attributeValue);
-                                    var convertedConditionValue = double.Parse(condition.ExpectValue);
-                                    if (convertedUserValue >= convertedConditionValue)
-                                    {
-                                        isMatchRule = false;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    isMatchRule = false;
-                                }
-                                break;
-                            case "equal":
-                                if (!attributeValue.Equals(condition.ExpectValue))
-                                {
-                                    isMatchRule = false;
-                                }
-                                break;
-                            case "contain":
-                                if (!attributeValue.Contains(condition.ExpectValue))
-                                {
-                                    isMatchRule = false;
-                                }
-                                break;
-                            case "starts_with":
-                                if (!attributeValue.StartsWith(condition.ExpectValue))
-                                {
-                                    isMatchRule = false;
-                                }
-                                break;
-                            case "ends_with":
-                                if (!attributeValue.EndsWith(condition.ExpectValue))
-                                {
-                                    isMatchRule = false;
-                                    break;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
+                        isMatchRule = MatchCondition(condition.Operation, attributeValue, condition.ExpectValue);
                         #endregion
                     }
                 }
@@ -165,6 +106,72 @@ namespace Lion.Client.SDK
                 return defaultValue;
             }
             #endregion
+        }
+
+        private bool MatchCondition(string logicOperator, string firstValue, string secondValue)
+        {
+            var result = true;
+            switch (logicOperator)
+            {
+                case "greater_than":
+                    try
+                    {
+                        var convertedFirstValue = double.Parse(firstValue);
+                        var convertedSecondValue = double.Parse(secondValue);
+                        if (convertedFirstValue <= convertedSecondValue)
+                        {
+                            result = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        result = false;
+                    }
+                    break;
+                case "less_than":
+                    try
+                    {
+                        var convertedFirstValue = double.Parse(firstValue);
+                        var convertedSecondValue = double.Parse(secondValue);
+                        if (convertedFirstValue >= convertedSecondValue)
+                        {
+                            result = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        result = false;
+                    }
+                    break;
+                case "equal":
+                    if (!firstValue.Equals(secondValue))
+                    {
+                        result = false;
+                    }
+                    break;
+                case "contain":
+                    if (!firstValue.Contains(secondValue))
+                    {
+                        result = false;
+                    }
+                    break;
+                case "starts_with":
+                    if (!firstValue.StartsWith(secondValue))
+                    {
+                        result = false;
+                    }
+                    break;
+                case "ends_with":
+                    if (!firstValue.EndsWith(secondValue))
+                    {
+                        result = false;
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return result;
         }
     }
 }
