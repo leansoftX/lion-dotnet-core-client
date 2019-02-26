@@ -13,7 +13,7 @@ namespace Lion.Client.SDK
         private readonly HttpClient _httpClient;
 
 
-        private const string DefaultAPIUri = "http://lion-test.devcloudx.com/api";
+        private const string DefaultAPIUri = "http://localhost:5003/api";
 
         public LionClient(string sdkKey)
         {
@@ -31,26 +31,33 @@ namespace Lion.Client.SDK
 
         public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
-            var feedbackUser = new LionUser(user.Key);
-            //send user request event and save user
-            if (!string.IsNullOrEmpty(user.Key))
+            try
             {
-                feedbackUser = SendFlagRequestEvent(key, user);
+                var feedbackUser = new LionUser(user.Key);
+                //send user request event and save user
+                if (!string.IsNullOrEmpty(user.Key))
+                {
+                    feedbackUser = SendFlagRequestEvent(key, user);
+                }
+
+                var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
+                var response = _httpClient.GetAsync(requestUrl);
+
+                if (response.Result.StatusCode != HttpStatusCode.OK)
+                {
+                    return defaultValue;
+                }
+
+                var result = response.Result.Content.ReadAsStringAsync().Result;
+                var flag = JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
+
+                var feature = new Feature(flag);
+                return feature.Evaluate(feedbackUser, defaultValue);
             }
-
-            var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
-            var response = _httpClient.GetAsync(requestUrl);
-
-            if (response.Result.StatusCode != HttpStatusCode.OK)
+            catch
             {
                 return defaultValue;
             }
-
-            var result = response.Result.Content.ReadAsStringAsync().Result;
-            var flag = JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
-
-            var feature = new Feature(flag);
-            return feature.Evaluate(feedbackUser, defaultValue);
         }
 
         private LionUser SendFlagRequestEvent(string key, LionUser user)
