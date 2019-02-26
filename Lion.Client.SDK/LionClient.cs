@@ -29,6 +29,13 @@ namespace Lion.Client.SDK
             return bool.Parse(result);
         }
 
+        /// <summary>
+        /// variate the bool type feature flag
+        /// </summary>
+        /// <param name="key">feature flag key</param>
+        /// <param name="user">the business user which will sent to the lion service</param>
+        /// <param name="defaultValue">the default return value when there are any kind of exception occurred</param>
+        /// <returns></returns>
         public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
             try
