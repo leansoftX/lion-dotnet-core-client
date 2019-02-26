@@ -29,28 +29,42 @@ namespace Lion.Client.SDK
             return bool.Parse(result);
         }
 
+        /// <summary>
+        /// variate the bool type feature flag
+        /// </summary>
+        /// <param name="key">feature flag key</param>
+        /// <param name="user">the business user which will sent to the lion service</param>
+        /// <param name="defaultValue">the default return value when there are any kind of exception occurred</param>
+        /// <returns></returns>
         public bool BoolVariation(string key, LionUser user, bool defaultValue = false)
         {
-            var feedbackUser = new LionUser(user.Key);
-            //send user request event and save user
-            if (!string.IsNullOrEmpty(user.Key))
+            try
             {
-                feedbackUser = SendFlagRequestEvent(key, user);
+                var feedbackUser = new LionUser(user.Key);
+                //send user request event and save user
+                if (!string.IsNullOrEmpty(user.Key))
+                {
+                    feedbackUser = SendFlagRequestEvent(key, user);
+                }
+
+                var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
+                var response = _httpClient.GetAsync(requestUrl);
+
+                if (response.Result.StatusCode != HttpStatusCode.OK)
+                {
+                    return defaultValue;
+                }
+
+                var result = response.Result.Content.ReadAsStringAsync().Result;
+                var flag = JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
+
+                var feature = new Feature(flag);
+                return feature.Evaluate(feedbackUser, defaultValue);
             }
-
-            var requestUrl = string.Format("{0}/Flags/{1}", DefaultAPIUri, key);
-            var response = _httpClient.GetAsync(requestUrl);
-
-            if (response.Result.StatusCode != HttpStatusCode.OK)
+            catch
             {
                 return defaultValue;
             }
-
-            var result = response.Result.Content.ReadAsStringAsync().Result;
-            var flag = JsonConvert.DeserializeObject<Models.FeatureFlagTargeting>(result);
-
-            var feature = new Feature(flag);
-            return feature.Evaluate(feedbackUser, defaultValue);
         }
 
         private LionUser SendFlagRequestEvent(string key, LionUser user)
