@@ -13,7 +13,7 @@ namespace Lion.Client.SDK
         private readonly HttpClient _httpClient;
 
 
-        private const string DefaultAPIUri = "http://localhost:5003/api";
+        private const string DefaultAPIUri = "http://lion-test.devcloudx.com/api";
 
         public LionClient(string sdkKey)
         {
