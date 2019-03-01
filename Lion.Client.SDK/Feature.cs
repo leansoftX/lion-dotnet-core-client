@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-
+using Lion.Client.SDK.Models;
 
 namespace Lion.Client.SDK
 {
@@ -37,12 +37,11 @@ namespace Lion.Client.SDK
 
             #region Targeting User
             var feature_on_targeting_users = _flag.FeatureOnTargetingUsers;
-            var feature_off_targeting_users = _flag.FeatureOffTargetingUsers;
             if (feature_on_targeting_users.Any(i => i.Key.Equals(user.Key)))
             {
                 return true;
             }
-
+            var feature_off_targeting_users = _flag.FeatureOffTargetingUsers;
             if (feature_off_targeting_users.Any(i => i.Key.Equals(user.Key)))
             {
                 return false;
@@ -59,28 +58,49 @@ namespace Lion.Client.SDK
                     {
                         break;
                     }
-                    var hasAttribute = false;
-                    var attributeName = "";
-                    foreach (var key in user.Custom.Keys)
+                    if (condition.UserAttribute.DataType.Equals("group"))
                     {
-                        if (key.Equals(condition.UserAttribute.Name))
+                        var segment = (from item in _flag.FeatureFlagSegments where item.SegmentGuid.ToString().Equals(condition.ExpectValue) select item).FirstOrDefault();
+                        if (segment == null)
                         {
-                            hasAttribute = true;
-                            attributeName = key;
+                            isMatchRule = false;
                             break;
                         }
-                    }
-                    if (!hasAttribute)
-                    {
-                        isMatchRule = false;
-                        break;
+                        else
+                        {
+                            var userBelongSegment = CheckUserBelongSegment(user, segment);
+                            if ((!userBelongSegment && condition.UserAttribute.Name.Equals("用户在组中")) || (userBelongSegment && condition.UserAttribute.Name.Equals("用户不在组中")))
+                            {
+                                isMatchRule = false;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
-                        #region Get User Attibute Value
-                        var attributeValue = user.Custom[attributeName].ToString();
-                        isMatchRule = MatchCondition(condition.Operation, attributeValue, condition.ExpectValue);
-                        #endregion
+                        var hasAttribute = false;
+                        var attributeName = "";
+                        foreach (var key in user.Custom.Keys)
+                        {
+                            if (key.Equals(condition.UserAttribute.Name))
+                            {
+                                hasAttribute = true;
+                                attributeName = key;
+                                break;
+                            }
+                        }
+                        if (!hasAttribute)
+                        {
+                            isMatchRule = false;
+                            break;
+                        }
+                        else
+                        {
+                            #region Get User Attibute Value
+                            var attributeValue = user.Custom[attributeName].ToString();
+                            isMatchRule = LionMatchOperator.Match(condition.Operation, attributeValue, condition.ExpectValue);
+                            #endregion
+                        }
                     }
                 }
                 //All conditions are passed
@@ -108,70 +128,59 @@ namespace Lion.Client.SDK
             #endregion
         }
 
-        private bool MatchCondition(string logicOperator, string firstValue, string secondValue)
+        private bool CheckUserBelongSegment(LionUser user, SegmentTargetingObj segment)
         {
-            var result = true;
-            switch (logicOperator)
+            var includeUserKeys = (from item in segment.IncludeUsers select item.Key).ToList();
+            if (includeUserKeys.Contains(user.Key))
             {
-                case "greater_than":
-                    try
+                return true;
+            }
+            var excludeUserKeys = (from item in segment.ExcludeUsers select item.Key).ToList();
+            if (excludeUserKeys.Contains(user.Key))
+            {
+                return false;
+            }
+            foreach (var rule in segment.Rules)
+            {
+                if (MatchRule(user, rule))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool MatchRule(LionUser user, RuleObj rule)
+        {
+            foreach (var condition in rule.Conditions)
+            {
+                var hasAttribute = false;
+                var attributeName = "";
+                foreach (var key in user.Custom.Keys)
+                {
+                    if (key.Equals(condition.UserAttribute.Name))
                     {
-                        var convertedFirstValue = double.Parse(firstValue);
-                        var convertedSecondValue = double.Parse(secondValue);
-                        if (convertedFirstValue <= convertedSecondValue)
-                        {
-                            result = false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        result = false;
-                    }
-                    break;
-                case "less_than":
-                    try
-                    {
-                        var convertedFirstValue = double.Parse(firstValue);
-                        var convertedSecondValue = double.Parse(secondValue);
-                        if (convertedFirstValue >= convertedSecondValue)
-                        {
-                            result = false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        result = false;
-                    }
-                    break;
-                case "equal":
-                    if (!firstValue.Equals(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "contain":
-                    if (!firstValue.Contains(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "starts_with":
-                    if (!firstValue.StartsWith(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "ends_with":
-                    if (!firstValue.EndsWith(secondValue))
-                    {
-                        result = false;
+                        hasAttribute = true;
+                        attributeName = key;
                         break;
                     }
-                    break;
-                default:
-                    break;
+                }
+                if (!hasAttribute)
+                {
+                    return false;
+                }
+                else
+                {
+                    var attributeValue = user.Custom[attributeName].ToString();
+                    if (!LionMatchOperator.Match(condition.Operation, attributeValue, condition.ExpectValue))
+                    {
+                        return false;
+                    }
+                }
             }
-            return result;
+            return true;
         }
+
+        
     }
 }

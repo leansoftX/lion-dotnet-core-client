@@ -36,6 +36,8 @@ namespace Lion.Client.SDK.Models
 
         public IList<FeatureFlagVariationObj> FeatureFlagVariations { get; set; }
 
+        public IList<SegmentTargetingObj> FeatureFlagSegments { get; set; }
+
         #endregion
     }
 
