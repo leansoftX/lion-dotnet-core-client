@@ -98,7 +98,7 @@ namespace Lion.Client.SDK
                         {
                             #region Get User Attibute Value
                             var attributeValue = user.Custom[attributeName].ToString();
-                            isMatchRule = MatchCondition(condition.Operation, attributeValue, condition.ExpectValue);
+                            isMatchRule = LionMatchOperator.Match(condition.Operation, attributeValue, condition.ExpectValue);
                             #endregion
                         }
                     }
@@ -172,7 +172,7 @@ namespace Lion.Client.SDK
                 else
                 {
                     var attributeValue = user.Custom[attributeName].ToString();
-                    if (!MatchCondition(condition.Operation, attributeValue, condition.ExpectValue))
+                    if (!LionMatchOperator.Match(condition.Operation, attributeValue, condition.ExpectValue))
                     {
                         return false;
                     }
@@ -181,70 +181,6 @@ namespace Lion.Client.SDK
             return true;
         }
 
-        private bool MatchCondition(string logicOperator, string firstValue, string secondValue)
-        {
-            var result = true;
-            switch (logicOperator)
-            {
-                case "greater_than":
-                    try
-                    {
-                        var convertedFirstValue = double.Parse(firstValue);
-                        var convertedSecondValue = double.Parse(secondValue);
-                        if (convertedFirstValue <= convertedSecondValue)
-                        {
-                            result = false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        result = false;
-                    }
-                    break;
-                case "less_than":
-                    try
-                    {
-                        var convertedFirstValue = double.Parse(firstValue);
-                        var convertedSecondValue = double.Parse(secondValue);
-                        if (convertedFirstValue >= convertedSecondValue)
-                        {
-                            result = false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        result = false;
-                    }
-                    break;
-                case "equal":
-                    if (!firstValue.Equals(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "contain":
-                    if (!firstValue.Contains(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "starts_with":
-                    if (!firstValue.StartsWith(secondValue))
-                    {
-                        result = false;
-                    }
-                    break;
-                case "ends_with":
-                    if (!firstValue.EndsWith(secondValue))
-                    {
-                        result = false;
-                        break;
-                    }
-                    break;
-                default:
-                    break;
-            }
-            return result;
-        }
+        
     }
 }
