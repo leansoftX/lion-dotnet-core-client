@@ -24,22 +24,22 @@
 4. 在Lion门户上的对应业务系统里创建你需要控制的 “功能标记”。
 5. 在你的业务系统里，通过创建好的 ”功能标记“ 唯一标示，来验证功能是否开启
 
-         var user = new LionUser("user-unique-key"); //user key is mandatory
+         var user = new LionUser("user-unique-key"); //Mandatory
 
-         user.Name = "username"; //user name is optional
+         user.Name = "username"; //Optional
 
-         user.Custom.Add("customer-attribute-key1", customer-attribute-value1); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key1", customer-attribute-value1); //Optional
 
-         user.Custom.Add("customer-attribute-key2", customer-attribute-value2); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key2", customer-attribute-value2); //Optional
 
-         user.Custom.Add("customer-attribute-key3", customer-attribute-value3); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key3", customer-attribute-value3); //Optional
 
-         bool showFeature = lionClient.BoolVariation("feature-key", user, false);
+         bool featureStatus = lionClient.BoolVariation("feature-key", user, false);
 
-         if (showFeature) {
-         // 显示功能的业务逻辑代码
+         if (featureStatus) {
+         //Business code when feature is on
          }
          else {
-         // 关闭功能的业务逻辑代码
+         //Business code when feature is off
          }
 
