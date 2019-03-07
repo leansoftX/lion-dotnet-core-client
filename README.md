@@ -24,8 +24,7 @@
 4. 在Lion门户上的对应业务系统里创建你需要控制的 “功能标记”。
 5. 在你的业务系统里，通过创建好的 ”功能标记“ 唯一标示，来验证功能是否开启
 
-        
-	var user = new LionUser("user-unique-key"); //user key is mandatory
+         var user = new LionUser("user-unique-key"); //user key is mandatory
 
     user.Name = "username"; //user name is optional
 
