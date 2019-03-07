@@ -26,20 +26,20 @@
 
          var user = new LionUser("user-unique-key"); //user key is mandatory
 
-    user.Name = "username"; //user name is optional
+         user.Name = "username"; //user name is optional
 
-    user.Custom.Add("customer-attribute-key1", customer-attribute-value1); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key1", customer-attribute-value1); //customer attributes are optional
 
-    user.Custom.Add("customer-attribute-key2", customer-attribute-value2); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key2", customer-attribute-value2); //customer attributes are optional
 
-    user.Custom.Add("customer-attribute-key3", customer-attribute-value3); //customer attributes are optional
+         user.Custom.Add("customer-attribute-key3", customer-attribute-value3); //customer attributes are optional
 
-    bool showFeature = lionClient.BoolVariation("feature-key", user, false);
+         bool showFeature = lionClient.BoolVariation("feature-key", user, false);
 
-    if (showFeature) {
-    // 显示功能的业务逻辑代码
-    }
-    else {
-    // 关闭功能的业务逻辑代码
-    }
+         if (showFeature) {
+         // 显示功能的业务逻辑代码
+         }
+         else {
+         // 关闭功能的业务逻辑代码
+         }
 
